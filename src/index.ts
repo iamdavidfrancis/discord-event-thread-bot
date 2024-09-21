@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits } from "discord.js";
 import { deployCommands } from "./deploy-commands";
 import { commands } from "./commands";
 import { config } from "./config";
+import DBService from "./services/db-service";
 
 const seenGuilds = new Set();
 
@@ -41,4 +42,9 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-client.login(config.DISCORD_TOKEN);
+const init = async () => {
+  await DBService.ensureDb();
+  await client.login(config.DISCORD_TOKEN);
+}
+
+init();

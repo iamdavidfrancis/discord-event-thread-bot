@@ -1,4 +1,5 @@
-import { CommandInteraction, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder, TextChannel, ThreadAutoArchiveDuration, ChannelType, EmbedBuilder, Embed } from "discord.js";
+import { CommandInteraction, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder, TextChannel, ThreadAutoArchiveDuration, ChannelType, EmbedBuilder, Embed, InteractionContextType } from "discord.js";
+import DBService from "../services/db-service";
 
 export const data = new SlashCommandBuilder()
   .setName("event")
@@ -14,22 +15,32 @@ export const data = new SlashCommandBuilder()
       .setDescription("The date of the event.")
       .setRequired(false))
   .setDefaultMemberPermissions(PermissionFlagsBits.CreatePublicThreads | PermissionFlagsBits.SendMessagesInThreads)
-  .setDMPermission(false);
-
-const channelId = "1286914978305282092";
+  .setContexts(InteractionContextType.Guild)
 
 export async function execute(interaction: CommandInteraction) {
-  const channel = await interaction.guild?.channels.fetch(channelId);
+  const guildId = interaction.guildId;
+
+  if (!guildId) {
+    console.error("The guildId was missing in the interaction.");
+    return interaction.reply("Unable to process command.");
+  }
+
+  const guildSettings = await DBService.getGuildSettings(guildId);
+  const { eventChannelId } = guildSettings;
+
+  if (!eventChannelId) {
+    return interaction.reply("The Channel that hosts the event threads has not yet been set. Please have an admin run `/config set-channel` to set the correct channel.");
+  }
+
+  const channel = await interaction.guild?.channels.fetch(eventChannelId);
 
   if (!channel) {
-    return interaction.reply("Couldn't find the event channel.");
+    return interaction.reply("Couldn't find the event channel."); 
   }
 
   if (interaction.isChatInputCommand() && channel instanceof TextChannel) {
-    const chatInteraction = interaction as ChatInputCommandInteraction;
-
-    const name = chatInteraction.options.getString("name", true);
-    const date = chatInteraction.options.getString("date") ?? "Unknown";
+    const name = interaction.options.getString("name", true);
+    const date = interaction.options.getString("date") ?? "Unknown";
     const authorMention = interaction.member?.toString() ?? "Event Bot";
     const authorName = interaction.member?.user.username ?? "Event Bot";
 
@@ -47,7 +58,7 @@ export async function execute(interaction: CommandInteraction) {
       .setFooter({ text: "Created by Event Thread Bot" })
       .toJSON();
 
-    const thread = await (channel as TextChannel).threads.create({
+    const thread = await channel.threads.create({
       name: name,
       autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
       type: ChannelType.PublicThread,
