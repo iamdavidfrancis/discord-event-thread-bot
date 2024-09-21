@@ -34,10 +34,10 @@ export async function execute(interaction: CommandInteraction) {
     const authorName = interaction.member?.user.username ?? "Event Bot";
 
     const eventEmbed = new EmbedBuilder()
-      .setAuthor({
-        name: authorName,
-        iconURL: interaction.member?.avatar ?? undefined,
-      })
+      // .setAuthor({
+      //   name: authorName,
+      //   iconURL: interaction.member?.avatar ?? undefined,
+      // })
       .setTitle(name)
       .setDescription(`${authorMention} created the event for ${date}`)
       .addFields(
@@ -58,9 +58,8 @@ export async function execute(interaction: CommandInteraction) {
       embeds: [eventEmbed]
     });
 
-    
     return interaction.reply(`Thread created! ${thread.url}`);
   }
   
-  return interaction.reply("Something went wrong creating the thread.")
+  return interaction.reply("Something went wrong creating the thread.");
 }
