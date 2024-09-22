@@ -9,10 +9,20 @@ export const data = new SlashCommandBuilder()
       .setName("name")
       .setDescription("The name of the event.")
       .setRequired(true))
+  .addAttachmentOption(option =>
+    option
+      .setName("attachment")
+      .setDescription("An attachment for the event. (Think like a flyer or similar)")
+      .setRequired(false))
   .addStringOption(option =>
     option
       .setName("date")
       .setDescription("The date of the event.")
+      .setRequired(false))
+  .addStringOption(option =>
+    option
+      .setName("description")
+      .setDescription("The event description.")
       .setRequired(false))
   .setDefaultMemberPermissions(PermissionFlagsBits.CreatePublicThreads | PermissionFlagsBits.SendMessagesInThreads)
   .setContexts(InteractionContextType.Guild)
@@ -40,23 +50,33 @@ export async function execute(interaction: CommandInteraction) {
 
   if (interaction.isChatInputCommand() && channel instanceof TextChannel) {
     const name = interaction.options.getString("name", true);
+    const description = interaction.options.getString("description");
     const date = interaction.options.getString("date") ?? "Unknown";
     const authorMention = interaction.member?.toString() ?? "Event Bot";
+    const attachment = interaction.options.getAttachment("attachment");
     const authorName = interaction.member?.user.username ?? "Event Bot";
 
-    const eventEmbed = new EmbedBuilder()
+    let eventEmbed = new EmbedBuilder()
       // .setAuthor({
       //   name: authorName,
       //   iconURL: interaction.member?.avatar ?? undefined,
       // })
       .setTitle(name)
-      .setDescription(`${authorMention} created the event for ${date}`)
+      .setDescription(!!description ? description : `${authorMention} created the event for ${date}`)
       .addFields(
+        { name: "Host", value: authorMention },
         { name: "Event Date", value: date },
+        { name: "Plan on Attending?", value: "Please react to this message if you're planning on attending.\n:white_check_mark: I'm attending\n:grey_question: I might attend\n:x: I can't attend"}
       )
       .setTimestamp()
       .setFooter({ text: "Created by Event Thread Bot" })
-      .toJSON();
+    
+    if (!!attachment) {
+      console.log(JSON.stringify(attachment));
+      eventEmbed = eventEmbed.setImage(attachment.url);
+    }
+      
+    const embed = eventEmbed.toJSON();
 
     const thread = await channel.threads.create({
       name: name,
@@ -65,9 +85,16 @@ export async function execute(interaction: CommandInteraction) {
       reason: "Event thread reason",
     });
 
-    await thread.send({
-      embeds: [eventEmbed]
+    const message = await thread.send({
+      embeds: [embed]
     });
+    
+    await Promise.all([
+      message.react('✅'),
+      message.react('❔'),
+      message.react('❌'),
+      message.pin(),
+    ]);
 
     return interaction.reply(`Thread created! ${thread.url}`);
   }
