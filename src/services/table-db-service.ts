@@ -14,7 +14,7 @@ class TableDBService implements IDBService {
     this.tableClient = new TableClient(`https://${config.STORAGE_ACCOUNT_NAME}.table.core.windows.net`, config.STORAGE_TABLE_NAME, credential);
   }
 
-  public async getGuildSettings(guildId: string): Promise<GuildSettings | undefined> {
+  public async getGuildSettings(guildId: string): Promise<GuildSettings> {
     try {
       const result = await this.tableClient.getEntity<TableEntity<GuildSettings>>(PartitionKey, guildId);
       
@@ -22,14 +22,12 @@ class TableDBService implements IDBService {
     }
     catch (error: any) {
 
-      if (error.statusCode === 404) {
-        return undefined;
+      if (error.statusCode !== 404) {
+        console.error(error);
       }
-
-      console.error(error);
     }
 
-    return undefined;
+    return {};
   }
 
   public async addOrUpdateGuildSettings(guildId: string, settings: GuildSettings): Promise<void> {
