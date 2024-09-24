@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, CommandInteraction, InteractionContextType, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
-import DBService from "../services/db-service";
+import DBService from "../services/table-db-service";
 
 export const data = new SlashCommandBuilder()
   .setName("config")

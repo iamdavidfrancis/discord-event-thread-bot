@@ -1,5 +1,5 @@
 import { CommandInteraction, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder, TextChannel, ThreadAutoArchiveDuration, ChannelType, EmbedBuilder, Embed, InteractionContextType } from "discord.js";
-import DBService from "../services/db-service";
+import DBService from "../services/table-db-service";
 
 export const data = new SlashCommandBuilder()
   .setName("event")
@@ -24,7 +24,7 @@ export const data = new SlashCommandBuilder()
       .setName("description")
       .setDescription("The event description.")
       .setRequired(false))
-  .setDefaultMemberPermissions(PermissionFlagsBits.CreatePublicThreads | PermissionFlagsBits.SendMessagesInThreads)
+  .setDefaultMemberPermissions(PermissionFlagsBits.CreatePublicThreads | PermissionFlagsBits.SendMessagesInThreads | PermissionFlagsBits.AddReactions)
   .setContexts(InteractionContextType.Guild)
 
 export async function execute(interaction: CommandInteraction) {
@@ -36,6 +36,12 @@ export async function execute(interaction: CommandInteraction) {
   }
 
   const guildSettings = await DBService.getGuildSettings(guildId);
+
+  if (!guildSettings) {
+    return interaction.reply("The Channel that hosts the event threads has not yet been set. Please have an admin run `/config set-channel` to set the correct channel.");
+  }
+
+
   const { eventChannelId } = guildSettings;
 
   if (!eventChannelId) {
@@ -93,7 +99,7 @@ export async function execute(interaction: CommandInteraction) {
       message.react('✅'),
       message.react('❔'),
       message.react('❌'),
-      message.pin(),
+      // message.pin(),
     ]);
 
     return interaction.reply(`Thread created! ${thread.url}`);

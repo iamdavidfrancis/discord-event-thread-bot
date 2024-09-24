@@ -1,11 +1,12 @@
 import { JSONFilePreset } from 'lowdb/node';
 import { Low } from 'lowdb/lib';
 import { config } from '../config';
+import { IDBService } from './db-service.interface';
 import DBSchema, { GuildSettings } from './db-schema';
 
-class DBService {
+class DBService implements IDBService {
   private db!: Low<DBSchema>;
-  
+
   private async init() {
     console.log("Initializing DB.");
 
@@ -27,7 +28,7 @@ class DBService {
     }
   }
 
-  public getGuildSettings(guildId: string): GuildSettings {
+  public async getGuildSettings(guildId: string): Promise<GuildSettings> {
     const settings = this.db.data.guildSettings[guildId];
 
     return settings ?? {};
