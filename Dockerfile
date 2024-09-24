@@ -21,6 +21,4 @@ RUN npm ci --only=production
 
 COPY --from=build /app/dist ./dist
 
-VOLUME ["./data"]
-
 CMD ["node", "dist/index.js"]

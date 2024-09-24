@@ -12,7 +12,6 @@ export const config = {
   DISCORD_TOKEN,
   DISCORD_CLIENT_ID,
   STORAGE_ACCOUNT_NAME,
-  STORAGE_TABLE_NAME,
-  DB_PATH: 'data/db.json'
+  STORAGE_TABLE_NAME
 };
 
