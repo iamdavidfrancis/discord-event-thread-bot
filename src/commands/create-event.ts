@@ -1,4 +1,5 @@
-import { CommandInteraction, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder, TextChannel, ThreadAutoArchiveDuration, ChannelType, EmbedBuilder, Embed, InteractionContextType } from "discord.js";
+import { CommandInteraction, PermissionFlagsBits, SlashCommandBuilder, TextChannel, ThreadAutoArchiveDuration, ChannelType, EmbedBuilder, InteractionContextType, time, TimestampStyles } from "discord.js";
+import * as chrono from 'chrono-node';
 import DBService from "../services/table-db-service";
 
 export const data = new SlashCommandBuilder()
@@ -41,7 +42,6 @@ export async function execute(interaction: CommandInteraction) {
     return interaction.reply("The Channel that hosts the event threads has not yet been set. Please have an admin run `/config set-channel` to set the correct channel.");
   }
 
-
   const { eventChannelId } = guildSettings;
 
   if (!eventChannelId) {
@@ -62,6 +62,25 @@ export async function execute(interaction: CommandInteraction) {
     const attachment = interaction.options.getAttachment("attachment");
     const authorName = interaction.member?.user.username ?? "Event Bot";
 
+    const chronoResult = chrono.parse(date, new Date(), {
+      forwardDate: true,
+    });
+
+    let startDate: string = date;
+    let endDate: string | undefined;
+
+    if (chronoResult?.length > 0) {
+      const result = chronoResult[0];
+
+      if (!!result.start) {
+        startDate = time(result.start.date(), TimestampStyles.ShortDateTime);
+
+        if (!!result.end) {
+          endDate = time(result.end.date(), TimestampStyles.ShortDateTime);
+        }
+      }
+    }
+
     let eventEmbed = new EmbedBuilder()
       // .setAuthor({
       //   name: authorName,
@@ -71,8 +90,7 @@ export async function execute(interaction: CommandInteraction) {
       .setDescription(!!description ? description : `${authorMention} created the event for ${date}`)
       .addFields(
         { name: "Host", value: authorMention },
-        { name: "Event Date", value: date },
-        { name: "Plan on Attending?", value: "Please react to this message if you're planning on attending.\n:white_check_mark: I'm attending\n:grey_question: I might attend\n:x: I can't attend"}
+        { name: "Event Date", value: startDate }
       )
       .setTimestamp()
       .setFooter({ text: "Created by Event Thread Bot" })
@@ -81,8 +99,14 @@ export async function execute(interaction: CommandInteraction) {
       console.log(JSON.stringify(attachment));
       eventEmbed = eventEmbed.setImage(attachment.url);
     }
+
+    if (!!endDate) {
+      eventEmbed = eventEmbed.addFields({ name: "Ends At", value: endDate });
+    }
       
-    const embed = eventEmbed.toJSON();
+    const embed = eventEmbed
+      .addFields({ name: "Plan on Attending?", value: "Please react to this message if you're planning on attending.\n:white_check_mark: I'm attending\n:grey_question: I might attend\n:x: I can't attend"})
+      .toJSON();
 
     const thread = await channel.threads.create({
       name: name,
