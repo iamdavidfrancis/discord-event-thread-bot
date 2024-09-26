@@ -30,7 +30,12 @@ class TableDBService implements IDBService {
     return {};
   }
 
-  public async addOrUpdateGuildSettings(guildId: string, settings: GuildSettings): Promise<void> {
+  public async addOrUpdateGuildSettings(guildId: string, settings: TableEntity<GuildSettings> | GuildSettings): Promise<void> {
+    if (!!(settings as TableEntity<GuildSettings>).partitionKey) {
+      await this.tableClient.upsertEntity(settings as TableEntity<GuildSettings>, "Merge");
+      return
+    }
+
     const entity: TableEntity<GuildSettings> = {
       partitionKey: PartitionKey,
       rowKey: guildId,
