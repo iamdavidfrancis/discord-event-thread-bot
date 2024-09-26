@@ -23,6 +23,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      image-digest: ${{ steps.build-and-push.outputs.digest }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -64,7 +66,7 @@ jobs:
       - name: Deploy App Revision
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy:  "ghcr.io/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:main"
+          imageToDeploy:  "ghcr.io/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:main@${{ needs.build.outputs.image-digest }}"
           containerAppName: ${{ vars.CONTAINER_APP_NAME }}
           resourceGroup: ${{ vars.CONTAINER_RESOURCE_GROUP }}
     
