@@ -4,13 +4,6 @@
 
 Allows users to create threads for their events easily. Still very much a Proof of Concept.
 
-TODO:
+**Note:** This doesn't use the "Events" feature in Discord. This simply makes threads in a channel and posts and embed with event details.
 
-1. ~~Dockerize this~~
-2. ~~DB persistence~~
-3. ~~Publish to docker hub or ACR~~
-4. Polish commands.
-    1. ~~Help~~
-    2. ~~Config~~
-    3. Modify?
-5. ~~Logo / Discord bot stuff.~~
+This is mostly a learning exercise because I was bored. Don't expect great things here.
