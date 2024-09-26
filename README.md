@@ -42,15 +42,17 @@ docker pull ghcr.io/iamdavidfrancis/discord-event-thread-bot:latest
 docker run --name "discord-event-thread-bot" --env-file ./.env ghcr.io/iamdavidfrancis/discord-event-thread-bot:latest
 ```
 
+#### Running in Azure
+
+If you're running in Azure with a managed identity you'll need to set everything in the above section, except the `Azure_` environment variables.
+
+#### Verify its running
+
 If everything worked, you should see this console log line:
 
 ```
 Discord bot is ready!
 ```
-
-#### Running in Azure
-
-If you're running in Azure you'll need to set everything in the above section, except the `Azure_` environment variables.
 
 ### Configuration
 
