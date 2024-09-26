@@ -1,4 +1,6 @@
 FROM node:current-alpine as build
+LABEL maintainer="David Francis <david@iamdavidfrancis.com>"
+LABEL org.opencontainers.image.source="https://github.com/iamdavidfrancis/discord-event-thread-bot"
 
 WORKDIR /app
 
@@ -11,8 +13,6 @@ COPY . .
 RUN npm run build
 
 FROM node:current-alpine
-LABEL maintainer="David Francis <david@iamdavidfrancis.com>"
-LABEL org.opencontainers.image.source="https://github.com/iamdavidfrancis/discord-event-thread-bot"
 
 WORKDIR /app
 
