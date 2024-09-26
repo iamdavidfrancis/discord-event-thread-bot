@@ -11,6 +11,10 @@ env:
   REPOSITORY: iamdavidfrancis
   IMAGE_NAME: discord-event-bot
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
