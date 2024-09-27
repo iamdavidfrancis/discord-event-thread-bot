@@ -21,6 +21,8 @@ If you want to self-host the bot, you'll need:
 
 I host the bot in Azure with an Azure Container App, so I'm using a Managed Identity. When I debug locally, I use a Service Principal registered in the directory.
 
+For information about deploying with azure, see the [./infrastructure](./infrastructure) folder.
+
 #### Running Locally
 
 If you're running locally, you'll want to create a `.env` file for the environment variables. You'll need to set:
