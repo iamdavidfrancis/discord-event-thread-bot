@@ -35,7 +35,7 @@ In the `secrets.arrayValue` array:
 ```json
 {
   "name": "registry-password",
-  "value": "{the app password for your registry}
+  "value": "{the app password for your registry}"
 }
 ```
 
