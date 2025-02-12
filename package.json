@@ -28,7 +28,7 @@
     "@azure/data-tables": "^13.2.2",
     "@azure/identity": "^4.4.1",
     "chrono-node": "^2.7.7",
-    "discord.js": "^14.16.2",
+    "discord.js": "^14.18.0",
     "dotenv": "^16.4.5",
     "lowdb": "^7.0.1"
   }
